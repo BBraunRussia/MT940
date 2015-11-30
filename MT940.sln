@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MT940", "MT940\MT940.csproj", "{C56796ED-5E9B-4364-904E-4F82382A052A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTestProjectMT940", "UnitTestProjectMT940\UnitTestProjectMT940.csproj", "{713D1618-3385-4F1E-AF4F-4CC989FDCCD0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C56796ED-5E9B-4364-904E-4F82382A052A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C56796ED-5E9B-4364-904E-4F82382A052A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C56796ED-5E9B-4364-904E-4F82382A052A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C56796ED-5E9B-4364-904E-4F82382A052A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{713D1618-3385-4F1E-AF4F-4CC989FDCCD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{713D1618-3385-4F1E-AF4F-4CC989FDCCD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{713D1618-3385-4F1E-AF4F-4CC989FDCCD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{713D1618-3385-4F1E-AF4F-4CC989FDCCD0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
