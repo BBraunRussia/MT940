@@ -81,33 +81,27 @@ namespace MT940
                 {
                     file1C.Read();
 
-                    if (file1C.IsSumEqualsTotal())
-                    {
-                        fileTxt.Init(file1C, settings, excelBook, invoice);
-                        fileTxt.WriteBody(FileTxt.TypeRow.D, file1C.Debet);
-                        fileTxt.WriteBody(FileTxt.TypeRow.C, file1C.Credit);
+                    file1C.IsSumDebetEqualsDebetTotal();
+                    file1C.IsSumCreditEqualsCreditTotal();
 
-                        fileTxt.WriteBottom();
+                    fileTxt.Init(file1C, settings, excelBook, invoice);
+                    fileTxt.WriteBody(FileTxt.TypeRow.D, file1C.Debet);
+                    fileTxt.WriteBody(FileTxt.TypeRow.C, file1C.Credit);
 
-                        MessageBox.Show("Файл сформирован.", "Завершено", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                    else
-                    {
-                        string mesage;
+                    fileTxt.WriteBottom();
 
-                        if (!file1C.IsSumDebetEqualsDebetTotal())
-                            mesage = "Формирование файла отменено, так как сумма по дебету не совпадает с итоговым значением.";
-                        else
-                            mesage = "Формирование файла отменено, так как сумма по кредиту не совпадает с итоговым значением.";
+                    MessageBox.Show("Файл сформирован.", "Завершено", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                        MessageBox.Show(mesage, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
                 }
                 else
                 {
                     MessageBox.Show("Пользователь отказался от ввода номера выписки, дальнейшее формирование файла не возможно", "Формирование файла отмененно",
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+            catch (OverflowException ex)
+            {
+                MessageBox.Show(ex.Message, "Формирование файла отмененно", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch
             {
