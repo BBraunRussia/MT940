@@ -53,16 +53,9 @@ namespace MT940
 
         private void btnCreateFile_Click(object sender, EventArgs e)
         {
-            try
-            {
-                File1COpening file = new File1COpening(settings);
+            File1COpening file = new File1COpening(settings);
 
-                Converter(file.GetFileName());
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            Converter(file.GetFileName());
         }
 
         private void Converter(string fileName)
@@ -99,6 +92,7 @@ namespace MT940
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+            
             catch (NullReferenceException ex)
             {
                 MessageBox.Show(ex.Message, "Формирование файла отмененно", MessageBoxButtons.OK, MessageBoxIcon.Error);
