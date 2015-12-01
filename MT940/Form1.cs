@@ -99,10 +99,15 @@ namespace MT940
                         MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
+            catch (NullReferenceException ex)
+            {
+                MessageBox.Show(ex.Message, "Формирование файла отмененно", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
             catch (OverflowException ex)
             {
                 MessageBox.Show(ex.Message, "Формирование файла отмененно", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+                /*
             catch
             {
                 if (file1C.CurrentCell != "")
@@ -114,6 +119,7 @@ namespace MT940
                     MessageBox.Show("Ошибка при обработке файла", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+                 * */
             finally
             {
                 excelBook.Dispose();

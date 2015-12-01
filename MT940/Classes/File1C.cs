@@ -160,37 +160,22 @@ namespace MT940
 
         public void ReadTails(int i)
         {
-            int max = i + 10;
+            _currentCell = "L" + i;
+            string sum = _excelBook.getValue(_currentCell, _currentCell).ToString().Replace("\n", "");
+            _incomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
+            
 
-            while (i < max)
-            {
-                if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Входящий остаток"))
-                {
-                    _currentCell = "L" + i;
-                    string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
-                    _incomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
-                }
+            _currentCell = "G" + (i + 1).ToString();
+            sum = _excelBook.getValue(_currentCell, _currentCell).ToString();
+            _debetTotal = FormatString(sum);
 
-                if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Исходящий остаток"))
-                {
-                    _currentCell = "L" + i;
-                    string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
-                    _outcomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
-                }
-
-                if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Итого оборотов"))
-                {
-                    _currentCell = "G" + i;
-                    string sum = _excelBook.getValue("G" + i, "G" + i).ToString();
-                    _debetTotal = FormatString(sum);
-
-                    _currentCell = "L" + i;
-                    sum = _excelBook.getValue("L" + i, "L" + i).ToString();
-                    _creditTotal = FormatString(sum);
-                }
-
-                i++;
-            }
+            _currentCell = "L" + (i + 1).ToString();
+            sum = _excelBook.getValue(_currentCell, _currentCell).ToString();
+            _creditTotal = FormatString(sum);
+            
+            _currentCell = "L" + (i + 2).ToString();
+            sum = _excelBook.getValue(_currentCell, _currentCell).ToString().Replace("\n", "");
+            _outcomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
         }
 
         private string FormatString(string str)
