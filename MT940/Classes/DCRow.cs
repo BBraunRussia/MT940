@@ -46,8 +46,8 @@ namespace MT940
         {
             if (value == null)
                 return;
-
-            _ordp = value.ToString();
+            
+            _ordp = value.ToString().Split('\n')[2];
         }
 
         public void SetOrdpWithoutDigit(object value)
@@ -69,7 +69,7 @@ namespace MT940
             if (value == null)
                 return;
 
-            _benm = value.ToString();
+            _benm = value.ToString().Split('\n')[2];
         }
 
         public void SetBenmWithoutDigit(object value)

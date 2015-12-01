@@ -62,101 +62,17 @@ namespace MT940
         {
             ReadHeader();
 
-            int i = GetIndexOnFirst();
-
-            while (_excelBook.getValue("A" + i, "A" + i) != null)
-            {
-                DCRow dcRow = new DCRow();
-
-                CurrentCell = "F" + i;
-                dcRow.SetNumber(_excelBook.getValue("F" + i, "F" + i));
-
-                CurrentCell = "D" + i;
-                if (_excelBook.getValue("D" + i, "D" + i) != null)
-                {
-                    CurrentCell = "B" + (i + 1);
-                    dcRow.SetOrdpWithoutDigit(_excelBook.getValue("B" + (i + 1), "B" + (i + 1)));
-
-                    CurrentCell = "C" + (i + 2);
-                    dcRow.SetBenm(_excelBook.getValue("C" + (i + 2), "C" + (i + 2)));
-
-                    CurrentCell = "I" + i;
-                    dcRow.SetCom(_excelBook.getValue("I" + i, "I" + i));
-
-                    CurrentCell = "D" + i;
-                    dcRow.SetSum(_excelBook.getValue("D" + i, "D" + i));
-
-                    debet.Add(dcRow);
-                }
-                else
-                {
-                    CurrentCell = "B" + (i + 2);
-                    dcRow.SetOrdp(_excelBook.getValue("B" + (i + 2), "B" + (i + 2)));
-
-                    CurrentCell = "C" + (i + 1);
-                    dcRow.SetBenmWithoutDigit(_excelBook.getValue("C" + (i + 1), "C" + (i + 1)));
-
-                    CurrentCell = "I" + i;
-                    dcRow.SetCom(_excelBook.getValue("I" + i, "I" + i));
-
-                    CurrentCell = "E" + i;
-                    dcRow.SetSum(_excelBook.getValue("E" + i, "E" + i));
-
-                    credit.Add(dcRow);
-                }
-
-                i += 3;
-            }
-
-            ReadTails(i);
+            ReadBody();
         }
 
         private void ReadHeader()
         {
-            int i = 1;
-            int indexAccountNumber = 1;
-
-            while (i < 100)
-            {
-                if (_excelBook.getValue("A" + i, "A" + i) != null)
-                {
-                    if (_excelBook.getValue("A" + i, "A" + i).ToString().Replace("\n", "") == "по")
-                    {
-                        break;
-                    }
-                    if ((_excelBook.getValue("A" + i, "A" + i).ToString().Replace("\n", "") == "ВЫПИСКА ОПЕРАЦИЙ ПО ЛИЦЕВОМУ СЧЕТУ")
-                        || (_excelBook.getValue("A" + i, "A" + i).ToString().Replace("\n", "") == "Счет:"))
-                    {
-                        indexAccountNumber = i;
-                    }
-                }
-                i++;
-            }
-
-            if (_excelBook.getValue("B" + indexAccountNumber, "B" + indexAccountNumber) != null)
-                _compNumber = _excelBook.getValue("B" + indexAccountNumber, "B" + indexAccountNumber).ToString().Replace("\n", "");
-            if (_excelBook.getValue("C" + indexAccountNumber, "C" + indexAccountNumber) != null)
-                _compNumber = _excelBook.getValue("C" + indexAccountNumber, "C" + indexAccountNumber).ToString().Replace("\n", "");
-            if (_excelBook.getValue("D" + indexAccountNumber, "D" + indexAccountNumber) != null)
-                _compNumber = _excelBook.getValue("D" + indexAccountNumber, "D" + indexAccountNumber).ToString().Replace("\n", "");
-            if (_excelBook.getValue("E" + indexAccountNumber, "E" + indexAccountNumber) != null)
-                _compNumber = _excelBook.getValue("E" + indexAccountNumber, "E" + indexAccountNumber).ToString().Replace("\n", "");
-            if (_excelBook.getValue("F" + indexAccountNumber, "F" + indexAccountNumber) != null)
-                _compNumber = _excelBook.getValue("F" + indexAccountNumber, "F" + indexAccountNumber).ToString().Replace("\n", "");
-
+            _compNumber = _excelBook.getValue("N4", "N4").ToString().Replace("\n", "");
+            
             if (_day == "")
             {
-                if (_excelBook.getValue("B" + i, "B" + i) != null)
-                    _date = _excelBook.getValue("B" + i, "B" + i).ToString().Replace("\n", "");
-                if (_excelBook.getValue("C" + i, "C" + i) != null)
-                    _date = _excelBook.getValue("C" + i, "C" + i).ToString().Replace("\n", "");
-                if (_excelBook.getValue("D" + i, "D" + i) != null)
-                    _date = _excelBook.getValue("D" + i, "D" + i).ToString().Replace("\n", "");
-                if (_excelBook.getValue("E" + i, "E" + i) != null)
-                    _date = _excelBook.getValue("E" + i, "E" + i).ToString().Replace("\n", "");
-                if (_excelBook.getValue("F" + i, "F" + i) != null)
-                    _date = _excelBook.getValue("F" + i, "F" + i).ToString().Replace("\n", "");
-
+                _date = _excelBook.getValue("N7", "N7").ToString().Replace("\n", "");
+                
                 _day = _date.Split(' ')[0];
 
                 if ((Convert.ToInt32(_day) / 10) == 0)
@@ -166,37 +82,110 @@ namespace MT940
                 _year = _date.Substring(_date.Length - 7, 4);
             }
         }
-
-        public void ReadTails(int indexLast)
+                
+        public bool IsSumDebetEqualsDebetTotal()
         {
-            int i = indexLast;
+            if (ComparisonStrings(debet.Sum, _debetTotal))
+                return true;
+            else
+                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по дебету (", debet.Sum, ") не совпадает с итоговым значением (", _debetTotal, ")." ));
+        }
 
+        public bool IsSumCreditEqualsCreditTotal()
+        {
+            if (ComparisonStrings(credit.Sum, _creditTotal))
+                return true;
+            else
+                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по кредиту (", credit.Sum, ") не совпадает с итоговым значением (", _creditTotal, ")."));
+        }
+
+        private bool ComparisonStrings(string str1, string str2)
+        {
+            if (str1.Length > str2.Length)
+                str1 = str1.Substring(0, str2.Length);
+            else if (str1.Length < str2.Length)
+                str2 = str2.Substring(0, str1.Length);
+
+            return str1 == str2;
+        }
+
+        private void ReadBody()
+        {
+            int i = 11;
+            int readBlocks = 0;
+            int countBlocks = GetCountBlocks();
+
+            while (readBlocks < countBlocks)
+            {
+                while (_excelBook.getValue("O" + i, "O" + i) != null)
+                {
+                    DCRow dcRow = new DCRow();
+
+                    CurrentCell = "O" + i;
+                    dcRow.SetNumber(_excelBook.getValue("O" + i, "O" + i));
+
+                    CurrentCell = "E" + i;
+                    dcRow.SetOrdp(_excelBook.getValue("E" + i, "E" + i));
+
+                    CurrentCell = "H" + i;
+                    dcRow.SetBenm(_excelBook.getValue("H" + i, "H" + i));
+
+                    CurrentCell = "V" + i;
+                    dcRow.SetCom(_excelBook.getValue("V" + i, "V" + i));
+
+                    CurrentCell = "J" + i;
+                    if ((_excelBook.getValue("J" + i, "J" + i) != null) && (_excelBook.getValue("J" + i, "J" + i).ToString() != string.Empty))
+                    {
+                        dcRow.SetSum(_excelBook.getValue("J" + i, "J" + i));
+
+                        debet.Add(dcRow);
+                    }
+                    else
+                    {
+                        CurrentCell = "M" + i;
+                        dcRow.SetSum(_excelBook.getValue("M" + i, "M" + i));
+
+                        credit.Add(dcRow);
+                    }
+
+                    i++;
+                }
+
+                i += 4;
+                readBlocks++;
+            }
+
+            ReadTails(i);
+        }
+
+        public void ReadTails(int i)
+        {
             int max = i + 10;
 
             while (i < max)
             {
                 if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Входящий остаток"))
                 {
-                    _currentCell = "D" + i;
-                    string sum = _excelBook.getValue("D" + i, "D" + i).ToString().Replace("\n", "");
+                    _currentCell = "L" + i;
+                    string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
                     _incomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
                 }
 
                 if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Исходящий остаток"))
                 {
-                    _currentCell = "D" + i;
-                    string sum = _excelBook.getValue("D" + i, "D" + i).ToString().Replace("\n", "");
+                    _currentCell = "L" + i;
+                    string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
                     _outcomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
                 }
 
                 if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Итого оборотов"))
                 {
-                    _currentCell = "C" + i;
-                    string sum = _excelBook.getValue("C" + i, "C" + i).ToString();
+                    _currentCell = "G" + i;
+                    string sum = _excelBook.getValue("G" + i, "G" + i).ToString();
                     _debetTotal = FormatString(sum);
 
-                    _currentCell = "D" + i;
-                    sum = _excelBook.getValue("D" + i, "D" + i).ToString();
+                    _currentCell = "L" + i;
+                    sum = _excelBook.getValue("L" + i, "L" + i).ToString();
                     _creditTotal = FormatString(sum);
                 }
 
@@ -217,50 +206,27 @@ namespace MT940
             return result;
         }
 
-        private int GetIndexOnFirst()
+        private int GetCountBlocks()
         {
-            int i = 1;
-            while (i < 100)
+            int i = 11;
+            int countNull = 0;
+            int countBlocks = 1;
+
+            while (countNull < 3)
             {
-                if (_excelBook.getValue("A" + i, "A" + i) != null)
+                if ((_excelBook.getValue("O" + i, "O" + i) == null) || (_excelBook.getValue("O" + i, "O" + i) == null))
+                    countNull++;
+                else
                 {
-                    if ((_excelBook.getValue("A" + i, "A" + i).ToString().Replace("\n", "") == "Дата проводки")
-                        || (_excelBook.getValue("A" + i, "A" + i).ToString().Replace("\n", "") == "Дата"))
-                    {
-                        break;
-                    }
+                    if (countNull == 2)
+                        countBlocks++;
+                    countNull = 0;
                 }
+
                 i++;
             }
 
-            i += 2;
-
-            return i;
-        }
-
-        public bool IsSumEqualsTotal()
-        {
-            return IsSumDebetEqualsDebetTotal() && IsSumCreditEqualsCreditTotal();
-        }
-
-        public bool IsSumDebetEqualsDebetTotal()
-        {
-            return ComparisonStrings(debet.Sum, _debetTotal);
-        }
-
-        private bool IsSumCreditEqualsCreditTotal()
-        {            
-            return ComparisonStrings(credit.Sum, _creditTotal);
-        }
-
-        private bool ComparisonStrings(string str1, string str2)
-        {
-            if (str1.Length > str2.Length)
-                str1 = str1.Substring(0, str2.Length);
-            else if (str1.Length < str2.Length)
-                str2 = str2.Substring(0, str1.Length);
-
-            return str1 == str2;
+            return countBlocks;
         }
     }
 }
