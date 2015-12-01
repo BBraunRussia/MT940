@@ -8,35 +8,45 @@ namespace MT940
 {
     public class Settings
     {
-        private int _number;
+        private int _numberBBraun;
+        private int _numberGematek;
+        private bool _isBBraunFile;
 
-        public string Number
-        {
-            get { return _number.ToString(); }
-        }
+        public string Number { get { return (_isBBraunFile) ? _numberBBraun.ToString() : _numberGematek.ToString(); } }
+        public bool IsBBraunFile { set { _isBBraunFile = value; } }
 
-        public Settings()
+        private static Settings _uniqueInstance;
+
+        private Settings()
         {
             Read();
         }
 
-        public void Read()
+        public static Settings GetUniqueInstance()
+        {
+            if (_uniqueInstance == null)
+                _uniqueInstance = new Settings();
+
+            return _uniqueInstance;
+        }
+
+        private void Read()
         {
             if (File.Exists("settings.ini"))
             {
                 using (StreamReader sr = new StreamReader("settings.ini"))
                 {
-                    try
-                    {
-                        string str;
-                        str = sr.ReadLine();
-                        str = str.Split('=')[1].Trim();
-                        int.TryParse(str, out _number);
-                    }
-                    catch { }
+                    string str;
+                    str = sr.ReadLine();
+                    str = str.Split('=')[1].Trim();
+                    int.TryParse(str, out _numberBBraun);
+
+                    str = sr.ReadLine();
+                    str = str.Split('=')[1].Trim();
+                    int.TryParse(str, out _numberGematek);
                 }
 
-                if (_number == 0)
+                if (_numberBBraun == 0)
                 {
                     throw new Exception("Не удалось распознать уникальный идентификатор. В меню Файл->параметры задайте новое значение уникального идентификатора.");
                 }
@@ -49,10 +59,15 @@ namespace MT940
 
         public void Save()
         {
-            _number++;
+            if (_isBBraunFile)
+                _numberBBraun++;
+            else
+                _numberGematek++;
+
             using (StreamWriter sw = new StreamWriter("settings.ini"))
             {
-                sw.WriteLine("N = " + _number.ToString());
+                sw.WriteLine("BBraun = " + _numberBBraun.ToString());
+                sw.WriteLine("Gematek = " + _numberGematek.ToString());
             }
         }
     }

@@ -12,13 +12,11 @@ namespace MT940
 
         private StreamWriter _streamWriter;
         private File1C _file1C;
-        private Settings _settings;
         private ExcelDoc _excelBook;
         
-        public void Init(File1C file1C, Settings settings, ExcelDoc excelBook, Invoice invoice)
+        public void Init(File1C file1C, ExcelDoc excelBook, Invoice invoice)
         {
             _file1C = file1C;
-            _settings = settings;
             _excelBook = excelBook;
 
             _streamWriter = new StreamWriter(Path.GetDirectoryName(_excelBook.FileName) + @"\" + file1C.CompNumber + "_" + file1C.Day + file1C.MonthDigit +
@@ -29,10 +27,12 @@ namespace MT940
 
         private void WriteHeader(Invoice invoice)
         {
-            WriteLine("{1:F01SABRRU2PAXXX0000000000}{2:I940SABRRU2PXXXXN}{4:");
-            WriteLine(":20:+5500" + _file1C.DateFormated + "0" + _settings.Number);
+            Settings settings = Settings.GetUniqueInstance();
 
-            _settings.Save();
+            WriteLine("{1:F01SABRRU2PAXXX0000000000}{2:I940SABRRU2PXXXXN}{4:");
+            WriteLine(":20:+5500" + _file1C.DateFormated + "0" + settings.Number);
+
+            settings.Save();
 
             WriteLine(":21:NONREF");
             WriteLine(":25:" + _file1C.CompNumber);
