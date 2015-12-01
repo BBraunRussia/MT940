@@ -112,10 +112,10 @@ namespace MT940
         private void ReadBody()
         {
             int i = 11;
-
             int readBlocks = 0;
+            int countBlocks = GetCountBlocks();
 
-            while (readBlocks < 3)
+            while (readBlocks < countBlocks)
             {
                 while (_excelBook.getValue("O" + i, "O" + i) != null)
                 {
@@ -204,6 +204,29 @@ namespace MT940
             }
 
             return result;
+        }
+
+        private int GetCountBlocks()
+        {
+            int i = 11;
+            int countNull = 0;
+            int countBlocks = 1;
+
+            while (countNull < 3)
+            {
+                if ((_excelBook.getValue("O" + i, "O" + i) == null) || (_excelBook.getValue("O" + i, "O" + i) == null))
+                    countNull++;
+                else
+                {
+                    if (countNull == 2)
+                        countBlocks++;
+                    countNull = 0;
+                }
+
+                i++;
+            }
+
+            return countBlocks;
         }
     }
 }
