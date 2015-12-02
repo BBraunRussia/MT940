@@ -7,8 +7,9 @@ namespace MT940
 {
     public class File1C
     {
+        public static string currentCell;
+
         private ExcelDoc _excelBook;
-        private string _currentCell;
 
         private string _date;
         private string _day;
@@ -36,13 +37,7 @@ namespace MT940
         public string OutcomeTail { get { return _outcomeTail.Replace('.', ','); } }
 
         public string DateFormated { get { return _year.Substring(2, 2) + MonthDigit + _day; } }
-
-        public string CurrentCell
-        {
-            get { return _currentCell; }
-            set { _currentCell = value; }
-        }
-
+        
         public File1C(ExcelDoc excelBook)
         {
             _excelBook = excelBook;
@@ -131,19 +126,19 @@ namespace MT940
                 {
                     DCRow dcRow = new DCRow();
 
-                    CurrentCell = "O" + i;
+                    currentCell = "O" + i;
                     dcRow.SetNumber(_excelBook.getValue("O" + i, "O" + i));
 
-                    CurrentCell = "E" + i;
+                    currentCell = "E" + i;
                     dcRow.SetOrdp(_excelBook.getValue("E" + i, "E" + i));
 
-                    CurrentCell = "H" + i;
+                    currentCell = "H" + i;
                     dcRow.SetBenm(_excelBook.getValue("H" + i, "H" + i));
 
-                    CurrentCell = "V" + i;
+                    currentCell = "V" + i;
                     dcRow.SetCom(_excelBook.getValue("V" + i, "V" + i));
 
-                    CurrentCell = "J" + i;
+                    currentCell = "J" + i;
                     if ((_excelBook.getValue("J" + i, "J" + i) != null) && (_excelBook.getValue("J" + i, "J" + i).ToString() != string.Empty))
                     {
                         dcRow.SetSum(_excelBook.getValue("J" + i, "J" + i));
@@ -152,7 +147,7 @@ namespace MT940
                     }
                     else
                     {
-                        CurrentCell = "M" + i;
+                        currentCell = "M" + i;
                         dcRow.SetSum(_excelBook.getValue("M" + i, "M" + i));
 
                         credit.Add(dcRow);
@@ -176,14 +171,14 @@ namespace MT940
             {
                 if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Входящий остаток"))
                 {
-                    _currentCell = "L" + i;
+                    currentCell = "L" + i;
                     string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
                     _incomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
                 }
 
                 if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Исходящий остаток"))
                 {
-                    _currentCell = "L" + i;
+                    currentCell = "L" + i;
                     if ((_excelBook.getValue("L" + i, "L" + i) == null) || (_excelBook.getValue("L" + i, "L" + i).ToString() == string.Empty))
                         throw new NullReferenceException("Нет данных в ячейки с исходящим остатком");
 
@@ -194,11 +189,11 @@ namespace MT940
 
                 if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Итого оборотов"))
                 {
-                    _currentCell = "G" + i;
+                    currentCell = "G" + i;
                     string sum = _excelBook.getValue("G" + i, "G" + i).ToString();
                     _debetTotal = FormatString(sum);
 
-                    _currentCell = "L" + i;
+                    currentCell = "L" + i;
                     sum = _excelBook.getValue("L" + i, "L" + i).ToString();
                     _creditTotal = FormatString(sum);
                 }
