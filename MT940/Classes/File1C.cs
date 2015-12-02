@@ -63,14 +63,6 @@ namespace MT940
         private void ReadHeader()
         {
             string orgName = _excelBook.getValue("N5", "N5").ToString().Replace("\n", "");
-            Settings settings = Settings.GetUniqueInstance();
-
-            if (orgName == "ООО \"Б.Браун Медикал\"")
-                settings.IsBBraunFile = true;
-            else if (orgName == "ООО \"Гематек\"")
-                settings.IsBBraunFile = false;
-            else
-                throw new NotImplementedException(string.Concat("Для организации ", orgName, " не реализован конвертер"));
 
             _compNumber = _excelBook.getValue("N4", "N4").ToString().Replace("\n", "");
                         

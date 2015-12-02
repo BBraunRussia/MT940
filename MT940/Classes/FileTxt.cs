@@ -27,12 +27,7 @@ namespace MT940
 
         private void WriteHeader(Invoice invoice)
         {
-            Settings settings = Settings.GetUniqueInstance();
-
             WriteLine("{1:F01SABRRU2PAXXX0000000000}{2:I940SABRRU2PXXXXN}{4:");
-            WriteLine(":20:+5500" + _file1C.DateFormated + "0" + settings.Number);
-
-            settings.Save();
 
             WriteLine(":21:NONREF");
             WriteLine(":25:" + _file1C.CompNumber);
