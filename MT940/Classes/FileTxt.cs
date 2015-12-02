@@ -6,14 +6,14 @@ using System.Text;
 
 namespace MT940
 {
-    public class FileTxt// : IDisposable
+    public class FileTxt : IDisposable
     {
         public enum TypeRow { D, C }
 
         private StreamWriter _streamWriter;
         private File1C _file1C;
         private ExcelDoc _excelBook;
-        
+
         public void Init(File1C file1C, ExcelDoc excelBook, Invoice invoice)
         {
             _file1C = file1C;
@@ -36,11 +36,11 @@ namespace MT940
 
             WriteLine(":21:NONREF");
             WriteLine(":25:" + _file1C.CompNumber);
-            
+
             WriteLine(":28C:" + invoice.GetNumberFormated());
             WriteLine(":60F:C" + _file1C.DateFormated + "RUB" + _file1C.IncomeTail);
         }
-        
+
         public void WriteBody(TypeRow type, DCRows dcRows)
         {
             foreach (DCRow dcRow in dcRows.List)
@@ -58,9 +58,9 @@ namespace MT940
                 }
             }
         }
-        
+
         public void WriteBottom()
-        {            
+        {
             WriteLine(":62F:C" + _file1C.DateFormated + "RUB" + _file1C.OutcomeTail);
             WriteLine("-}");
         }
@@ -68,6 +68,12 @@ namespace MT940
         public void WriteLine(string text)
         {
             _streamWriter.WriteLine(text);
+        }
+
+        public void Dispose()
+        {
+            if (_streamWriter != null)
+                _streamWriter.Close();
         }
     }
 }
