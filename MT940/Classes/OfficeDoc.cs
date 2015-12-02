@@ -64,7 +64,7 @@ namespace MT940
             releaseObject(xlWorkBook);
             releaseObject(xlApp);
         }
-
+        
         internal void Print()
         {
             object misValue = System.Reflection.Missing.Value;

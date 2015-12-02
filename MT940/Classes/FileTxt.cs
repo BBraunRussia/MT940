@@ -6,7 +6,7 @@ using System.Text;
 
 namespace MT940
 {
-    public class FileTxt : IDisposable
+    public class FileTxt// : IDisposable
     {
         public enum TypeRow { D, C }
 
@@ -68,12 +68,6 @@ namespace MT940
         public void WriteLine(string text)
         {
             _streamWriter.WriteLine(text);
-        }
-
-        public void Dispose()
-        {
-            if (_streamWriter != null)
-                _streamWriter.Close();
         }
     }
 }

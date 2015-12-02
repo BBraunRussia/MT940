@@ -6,9 +6,9 @@ using System.Windows.Forms;
 
 namespace MT940
 {
-    public class File1COpening
+    public static class File1COpening
     {
-        public string GetFileName()
+        public static string GetFileName()
         {
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "Excel files (*.xls)|*.xls";
@@ -18,7 +18,7 @@ namespace MT940
             if (ofd.ShowDialog() == DialogResult.OK)
                 return ofd.FileName;
             else
-                throw new Exception("Файл не выбран");
+                throw new NullReferenceException("Файл не выбран");
         }
     }
 }

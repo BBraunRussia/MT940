@@ -10,7 +10,11 @@ namespace MT940
     {
         private int _numberBBraun;
         private int _numberGematek;
+        private string _nameBBraun;
+        private string _nameGematek;
         private bool _isBBraunFile;
+
+        private string _comment;
 
         public string Number { get { return (_isBBraunFile) ? _numberBBraun.ToString() : _numberGematek.ToString(); } }
         public bool IsBBraunFile { set { _isBBraunFile = value; } }
@@ -37,13 +41,18 @@ namespace MT940
                 using (StreamReader sr = new StreamReader("settings.ini"))
                 {
                     string str;
-                    str = sr.ReadLine();
-                    str = str.Split('=')[1].Trim();
-                    int.TryParse(str, out _numberBBraun);
+                    str = sr.ReadLine(); //примечание
+                    _comment = str;
 
                     str = sr.ReadLine();
-                    str = str.Split('=')[1].Trim();
-                    int.TryParse(str, out _numberGematek);
+                    string[] line = str.Split('=');
+                    _nameBBraun = line[0].Trim();
+                    int.TryParse(line[1].Trim(), out _numberBBraun);
+
+                    str = sr.ReadLine();
+                    line = str.Split('=');
+                    _nameGematek = line[0].Trim();
+                    int.TryParse(line[1].Trim(), out _numberGematek);
                 }
 
                 if (_numberBBraun == 0)
@@ -66,8 +75,9 @@ namespace MT940
 
             using (StreamWriter sw = new StreamWriter("settings.ini"))
             {
-                sw.WriteLine("BBraun = " + _numberBBraun.ToString());
-                sw.WriteLine("Gematek = " + _numberGematek.ToString());
+                sw.WriteLine(_comment);
+                sw.WriteLine(string.Concat(_nameBBraun, " = ", _numberBBraun.ToString()));
+                sw.WriteLine(string.Concat(_nameGematek, " = ", _numberGematek.ToString()));
             }
         }
     }

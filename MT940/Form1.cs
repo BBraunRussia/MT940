@@ -30,43 +30,43 @@ namespace MT940
 
         private void btnCreateFile_Click(object sender, EventArgs e)
         {
-            File1COpening file = new File1COpening();
-
-            Converter(file.GetFileName());
+            Converter();
         }
 
-        private void Converter(string fileName)
+        private void Converter()
         {
-            ExcelDoc excelBook = new ExcelDoc(fileName);
-
-            File1C file1C = new File1C(excelBook);
-            FileTxt fileTxt = new FileTxt();
-
             try
             {
-                Invoice invoice = new Invoice();
-                InputDialog id = new InputDialog(invoice);
-
-                if (id.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                using (ExcelDoc excelBook = new ExcelDoc(File1COpening.GetFileName()))
                 {
-                    file1C.Read();
+                    FileTxt fileTxt = new FileTxt();
 
-                    file1C.IsSumDebetEqualsDebetTotal();
-                    file1C.IsSumCreditEqualsCreditTotal();
+                    File1C file1C = new File1C(excelBook);
 
-                    fileTxt.Init(file1C, excelBook, invoice);
-                    fileTxt.WriteBody(FileTxt.TypeRow.D, file1C.Debet);
-                    fileTxt.WriteBody(FileTxt.TypeRow.C, file1C.Credit);
+                    Invoice invoice = new Invoice();
+                    InputDialog id = new InputDialog(invoice);
 
-                    fileTxt.WriteBottom();
+                    if (id.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    {
+                        file1C.Read();
 
-                    MessageBox.Show("Файл сформирован.", "Завершено", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        file1C.IsSumDebetEqualsDebetTotal();
+                        file1C.IsSumCreditEqualsCreditTotal();
 
-                }
-                else
-                {
-                    MessageBox.Show("Пользователь отказался от ввода номера выписки, дальнейшее формирование файла не возможно", "Формирование файла отмененно",
-                        MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        fileTxt.Init(file1C, excelBook, invoice);
+                        fileTxt.WriteBody(FileTxt.TypeRow.D, file1C.Debet);
+                        fileTxt.WriteBody(FileTxt.TypeRow.C, file1C.Credit);
+
+                        fileTxt.WriteBottom();
+
+                        MessageBox.Show("Файл сформирован.", "Завершено", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Пользователь отказался от ввода номера выписки, дальнейшее формирование файла не возможно", "Формирование файла отмененно",
+                            MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
                 }
             }
 
@@ -81,11 +81,6 @@ namespace MT940
             catch (NotImplementedException ex)
             {
                 MessageBox.Show(ex.Message, "Формирование файла отмененно", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            finally
-            {
-                excelBook.Dispose();
-                fileTxt.Dispose();
             }
 
             Close();
