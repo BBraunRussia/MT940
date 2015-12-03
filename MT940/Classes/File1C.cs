@@ -24,6 +24,8 @@ namespace MT940
         private DCRows debet;
         private DCRows credit;
 
+        private Invoice _invoice;
+
         public DCRows Debet { get { return debet; } }
         public DCRows Credit { get { return credit; } }
 
@@ -32,14 +34,15 @@ namespace MT940
         public string Day { get { return _day; } }
         public string MonthDigit { get { return MyMonth.MonthToDigit(_month); } }
         public string Year { get { return _year; } }
-        
-        public string IncomeTail { get { return _incomeTail.Replace('.', ','); } }
-        public string OutcomeTail { get { return _outcomeTail.Replace('.', ','); } }
+
+        public string IncomeTail { get { return (_incomeTail == "0,00") ? "0," : _incomeTail; } }
+        public string OutcomeTail { get { return (_outcomeTail == "0,00") ? "0," : _outcomeTail; } }
 
         public string DateFormated { get { return _year.Substring(2, 2) + MonthDigit + _day; } }
         
         public File1C(ExcelDoc excelBook)
         {
+            _invoice = Invoice.GetUniqueInstance();
             _excelBook = excelBook;
 
             _date = "";
@@ -62,13 +65,13 @@ namespace MT940
 
         private void ReadHeader()
         {
-            string orgName = _excelBook.getValue("N5", "N5").ToString().Replace("\n", "");
-
-            _compNumber = _excelBook.getValue("N4", "N4").ToString().Replace("\n", "");
+            currentCell = (_invoice.IsRub) ? "N4" : "L4";
+            _compNumber = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                         
             if (_day == "")
             {
-                _date = _excelBook.getValue("N7", "N7").ToString().Replace("\n", "");
+                currentCell = (_invoice.IsRub) ? "N7" : "L7";
+                _date = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                 
                 _day = _date.Split(' ')[0];
 
@@ -118,29 +121,29 @@ namespace MT940
                 {
                     DCRow dcRow = new DCRow();
 
-                    currentCell = "O" + i;
-                    dcRow.SetNumber(_excelBook.getValue("O" + i, "O" + i));
+                    currentCell = (_invoice.IsRub) ? "O" + i : "D" + i;
+                    dcRow.SetNumber(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = "E" + i;
-                    dcRow.SetOrdp(_excelBook.getValue("E" + i, "E" + i));
+                    currentCell = (_invoice.IsRub) ? "E" + i : "E" + i;
+                    dcRow.SetOrdp(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = "H" + i;
-                    dcRow.SetBenm(_excelBook.getValue("H" + i, "H" + i));
+                    currentCell = (_invoice.IsRub) ? "H" + i : "G" + i;
+                    dcRow.SetBenm(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = "V" + i;
-                    dcRow.SetCom(_excelBook.getValue("V" + i, "V" + i));
+                    currentCell = (_invoice.IsRub) ? "V" + i : "Y" + i;
+                    dcRow.SetCom(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = "J" + i;
-                    if ((_excelBook.getValue("J" + i, "J" + i) != null) && (_excelBook.getValue("J" + i, "J" + i).ToString() != string.Empty))
+                    currentCell = (_invoice.IsRub) ? "J" + i : "I" + i;
+                    if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() != string.Empty))
                     {
-                        dcRow.SetSum(_excelBook.getValue("J" + i, "J" + i));
+                        dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
                         debet.Add(dcRow);
                     }
                     else
                     {
-                        currentCell = "M" + i;
-                        dcRow.SetSum(_excelBook.getValue("M" + i, "M" + i));
+                        currentCell = (_invoice.IsRub) ? "M" + i : "O" + i;
+                        dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
                         credit.Add(dcRow);
                     }
@@ -161,33 +164,30 @@ namespace MT940
 
             while (i < max)
             {
-                if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Входящий остаток"))
+                currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
+                if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Входящий остаток"))
                 {
-                    currentCell = "L" + i;
-                    string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
-                    _incomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
+                    currentCell = (_invoice.IsRub) ? "L" + i : "N" + i;
+                    _incomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
-                if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Исходящий остаток"))
+                currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
+                if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Исходящий остаток"))
                 {
-                    currentCell = "L" + i;
-                    if ((_excelBook.getValue("L" + i, "L" + i) == null) || (_excelBook.getValue("L" + i, "L" + i).ToString() == string.Empty))
-                        throw new NullReferenceException("Нет данных в ячейки с исходящим остатком");
-
-                    string sum = _excelBook.getValue("L" + i, "L" + i).ToString().Replace("\n", "");
-                    
-                    _outcomeTail = sum.Substring(0, sum.Length - 4).Replace(" ", "");
+                    currentCell = (_invoice.IsRub) ? "L" + i : "N" + i;
+                    _outcomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
-                if ((_excelBook.getValue("B" + i, "B" + i) != null) && (_excelBook.getValue("B" + i, "B" + i).ToString() == "Итого оборотов"))
+                currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
+                if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Итого оборотов"))
                 {
-                    currentCell = "G" + i;
-                    string sum = _excelBook.getValue("G" + i, "G" + i).ToString();
-                    _debetTotal = FormatString(sum);
+                    currentCell = (_invoice.IsRub) ? "G" + i : "F" + i;
+                    string formatTotal = FormatTotal(_excelBook.getValue(currentCell, currentCell).ToString());
+                    _debetTotal = FormatString(formatTotal);
 
-                    currentCell = "L" + i;
-                    sum = _excelBook.getValue("L" + i, "L" + i).ToString();
-                    _creditTotal = FormatString(sum);
+                    currentCell = (_invoice.IsRub) ? "L" + i : "N" + i;
+                    formatTotal = FormatTotal(_excelBook.getValue(currentCell, currentCell).ToString());
+                    _creditTotal = FormatString(formatTotal);
                 }
 
                 i++;
@@ -215,7 +215,9 @@ namespace MT940
 
             while (countNull < 3)
             {
-                if ((_excelBook.getValue("O" + i, "O" + i) == null) || (_excelBook.getValue("O" + i, "O" + i) == null))
+                currentCell = (_invoice.IsRub) ? "O" + i : "D" + i;
+
+                if ((_excelBook.getValue(currentCell, currentCell) == null) || (_excelBook.getValue(currentCell, currentCell) == null))
                     countNull++;
                 else
                 {
@@ -228,6 +230,19 @@ namespace MT940
             }
 
             return countBlocks;
+        }
+
+
+        private string FormatTail(string sum)
+        {
+            sum = sum.Replace(" ", "");
+            return (_invoice.IsRub) ? sum.Substring(0, sum.Length - 3) : sum.Substring(0, sum.Length - 10).Split('/')[1];
+        }
+
+        private string FormatTotal(string sum)
+        {
+            sum = sum.Replace(" ", "");
+            return (_invoice.IsRub) ? sum : sum.Substring(0, sum.Length - 7).Split('/')[1];
         }
     }
 }

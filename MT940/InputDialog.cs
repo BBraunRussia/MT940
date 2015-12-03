@@ -13,17 +13,18 @@ namespace MT940
     {
         private Invoice _invoice;
 
-        public InputDialog(Invoice invoice)
+        public InputDialog()
         {
             InitializeComponent();
 
-            _invoice = invoice;
+            _invoice = Invoice.GetUniqueInstance();
             input.Text = _invoice.Number;
         }
 
         private void btnSave_Click(object sender, EventArgs e)
         {
             _invoice.Number = input.Text;
+            _invoice.IsRub = radioButton1.Checked;
         }
     }
 }

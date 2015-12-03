@@ -47,7 +47,7 @@ namespace MT940
         {
             return xlSh.get_Range(rowCell, columnCell).Value2;
         }
-
+        
         public void Show()
         {
             xlSh.Columns.AutoFit();

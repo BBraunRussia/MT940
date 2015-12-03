@@ -43,8 +43,7 @@ namespace MT940
                     {
                         File1C file1C = new File1C(excelBook);
 
-                        Invoice invoice = new Invoice();
-                        InputDialog id = new InputDialog(invoice);
+                        InputDialog id = new InputDialog();
 
                         if (id.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
@@ -53,7 +52,7 @@ namespace MT940
                             file1C.IsSumDebetEqualsDebetTotal();
                             file1C.IsSumCreditEqualsCreditTotal();
 
-                            fileTxt.Init(file1C, excelBook, invoice);
+                            fileTxt.Init(file1C, excelBook);
                             fileTxt.WriteBody(FileTxt.TypeRow.D, file1C.Debet);
                             fileTxt.WriteBody(FileTxt.TypeRow.C, file1C.Credit);
 

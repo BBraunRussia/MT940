@@ -14,38 +14,46 @@ namespace MT940
         private File1C _file1C;
         private ExcelDoc _excelBook;
 
-        public void Init(File1C file1C, ExcelDoc excelBook, Invoice invoice)
+        private Invoice _invoice;
+
+        public void Init(File1C file1C, ExcelDoc excelBook)
         {
             _file1C = file1C;
             _excelBook = excelBook;
 
+            _invoice = Invoice.GetUniqueInstance();
+
             _streamWriter = new StreamWriter(Path.GetDirectoryName(_excelBook.FileName) + @"\" + file1C.CompNumber + "_" + file1C.Day + file1C.MonthDigit +
                     file1C.Year.Substring(2, 2) + "_vip.txt", false, Encoding.Unicode);
 
-            WriteHeader(invoice);
+            WriteHeader();
         }
 
-        private void WriteHeader(Invoice invoice)
+        private void WriteHeader()
         {
             WriteLine("{1:F01SABRRU2PAXXX0000000000}{2:I940SABRRU2PXXXXN}{4:");
 
             WriteLine(":21:NONREF");
-            WriteLine(":25:" + _file1C.CompNumber);
+            WriteLine(string.Concat(":25:", _file1C.CompNumber));
 
-            WriteLine(":28C:" + invoice.GetNumberFormated());
-            WriteLine(":60F:C" + _file1C.DateFormated + "RUB" + _file1C.IncomeTail);
+            WriteLine(string.Concat(":28C:", _invoice.GetNumberFormated()));
+
+            WriteLine(string.Concat(":60F:C", _file1C.DateFormated, _invoice.Currency, _file1C.IncomeTail));
         }
 
         public void WriteBody(TypeRow type, DCRows dcRows)
         {
             foreach (DCRow dcRow in dcRows.List)
             {
-                string temp = dcRow.SumString.ToString();
-                if (temp.IndexOf(',') == -1)
-                    temp += ",";
-                WriteLine(":61:" + _file1C.DateFormated + type.ToString() + temp + "NCMI" + dcRow.Number + "//" + dcRow.Number);
-                WriteLine(":86:/ORDP/" + dcRow.Ordp);
-                WriteLine("/BENM/" + dcRow.Benm);
+                string sum = dcRow.SumString.ToString();
+                if (sum.IndexOf(',') == -1)
+                    sum += ",";
+
+                string letters = (_invoice.IsRub) ? "NCMI" : "NTRF";
+
+                WriteLine(string.Concat(":61:", _file1C.DateFormated, type.ToString(), sum, letters, dcRow.Number, "//", dcRow.Number));
+                WriteLine(string.Concat(":86:/ORDP/", dcRow.Ordp));
+                WriteLine(string.Concat("/BENM/", dcRow.Benm));
 
                 foreach (string s1 in dcRow.CommList)
                 {
@@ -56,7 +64,7 @@ namespace MT940
 
         public void WriteBottom()
         {
-            WriteLine(":62F:C" + _file1C.DateFormated + "RUB" + _file1C.OutcomeTail);
+            WriteLine(string.Concat(":62F:C", _file1C.DateFormated, _invoice.Currency, _file1C.OutcomeTail));
             WriteLine("-}");
         }
 

@@ -8,14 +8,11 @@ namespace MT940
     public class Invoice
     {
         private string _number;
+        private bool _isRub;
 
-        public string Number
-        {
-            get { return _number; }
-            set { _number = value; }
-        }
+        private static Invoice _uniqueInstance;
 
-        public Invoice()
+        private Invoice()
         {
             string day;
 
@@ -28,6 +25,28 @@ namespace MT940
 
             Number = day + "." + "001";
         }
+
+        public static Invoice GetUniqueInstance()
+        {
+            if (_uniqueInstance == null)
+                _uniqueInstance = new Invoice();
+
+            return _uniqueInstance;
+        }
+
+        public string Number
+        {
+            get { return _number; }
+            set { _number = value; }
+        }
+
+        public bool IsRub
+        {
+            get { return _isRub; }
+            set { _isRub = value; }
+        }
+
+        public string Currency { get { return (_isRub) ? "RUB" : "EUR"; } }
 
         public string GetNumberFormated()
         {
