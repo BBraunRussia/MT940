@@ -138,14 +138,16 @@ namespace MT940
                     {
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
-                        debet.Add(dcRow);
+                        if (dcRow.Sum != 0.0)
+                            debet.Add(dcRow);
                     }
                     else
                     {
                         currentCell = (_invoice.IsRub) ? "M" + i : "O" + i;
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
-                        credit.Add(dcRow);
+                        if (dcRow.Sum != 0.0)
+                            credit.Add(dcRow);
                     }
 
                     i++;
@@ -231,7 +233,6 @@ namespace MT940
 
             return countBlocks;
         }
-
 
         private string FormatTail(string sum)
         {
