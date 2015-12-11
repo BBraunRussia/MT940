@@ -236,14 +236,14 @@ namespace MT940
 
         private string FormatTail(string sum)
         {
-            sum = DeleteSplits(sum);
-            return (_invoice.IsRub) ? sum.Substring(0, sum.Length - 3) : sum.Substring(0, sum.Length - 10).Split('/')[1];
+            sum = (_invoice.IsRub) ? sum.Substring(0, sum.Length - 3) : sum.Substring(0, sum.Length - 13).Split('/')[1];
+            return DeleteSplits(sum);
         }
 
         private string FormatTotal(string sum)
         {
-            sum = DeleteSplits(sum);
-            return (_invoice.IsRub) ? sum : sum.Substring(0, sum.Length - 7).Split('/')[1];
+            sum = (_invoice.IsRub) ? sum : sum.Substring(0, sum.Length - 9).Split('/')[1];
+            return DeleteSplits(sum);
         }
 
         public static string DeleteSplits(string value)
