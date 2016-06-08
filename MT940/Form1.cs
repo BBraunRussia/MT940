@@ -69,7 +69,6 @@ namespace MT940
                     }
                 }
             }
-
             catch (NullReferenceException ex)
             {
                 MessageBox.Show(ex.Message, "Формирование файла отмененно", MessageBoxButtons.OK, MessageBoxIcon.Error);

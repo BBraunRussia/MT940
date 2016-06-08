@@ -65,12 +65,12 @@ namespace MT940
 
         private void ReadHeader()
         {
-            currentCell = (_invoice.IsRub) ? "N4" : "L4";
+            currentCell = (_invoice.IsRub) ? "O5" : "L4";
             _compNumber = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                         
             if (_day == "")
             {
-                currentCell = (_invoice.IsRub) ? "N7" : "L7";
+                currentCell = (_invoice.IsRub) ? "O8" : "L7";
                 _date = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                 
                 _day = _date.Split(' ')[0];
@@ -111,29 +111,30 @@ namespace MT940
 
         private void ReadBody()
         {
-            int i = 11;
+            int i = (_invoice.IsRub) ? 12 : 11; //первая строка с данными
+            int incement = (_invoice.IsRub) ? 7 : 4; //первая строка с данными
             int readBlocks = 0;
             int countBlocks = GetCountBlocks();
 
             while (readBlocks < countBlocks)
             {
-                while (_excelBook.getValue("O" + i, "O" + i) != null)
+                while (_excelBook.getValue("E" + i, "E" + i) != null)
                 {
                     DCRow dcRow = new DCRow();
 
-                    currentCell = (_invoice.IsRub) ? "O" + i : "D" + i;
+                    currentCell = (_invoice.IsRub) ? "P" + i : "D" + i; //№ документа
                     dcRow.SetNumber(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "E" + i : "E" + i;
+                    currentCell = (_invoice.IsRub) ? "E" + i : "E" + i; //Счёт дебет
                     dcRow.SetOrdp(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "H" + i : "G" + i;
+                    currentCell = (_invoice.IsRub) ? "I" + i : "G" + i; //Счёт кредит
                     dcRow.SetBenm(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "V" + i : "Y" + i;
+                    currentCell = (_invoice.IsRub) ? "W" + i : "Y" + i; //Назначение платежа
                     dcRow.SetCom(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "J" + i : "I" + i;
+                    currentCell = (_invoice.IsRub) ? "K" + i : "I" + i; //Сумма по дебету
                     if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() != string.Empty))
                     {
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
@@ -143,7 +144,7 @@ namespace MT940
                     }
                     else
                     {
-                        currentCell = (_invoice.IsRub) ? "M" + i : "O" + i;
+                        currentCell = (_invoice.IsRub) ? "N" + i : "O" + i; //Сумма по кредиту
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
                         if (dcRow.Sum != 0.0)
@@ -153,47 +154,56 @@ namespace MT940
                     i++;
                 }
 
-                i += 4;
+                i += incement;
                 readBlocks++;
             }
 
-            ReadTails(i);
+            ReadTails(i - incement);
         }
 
         public void ReadTails(int i)
         {
-            int max = i + 10;
+            int max = i + 20;
 
             while (i < max)
             {
                 currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Входящий остаток"))
                 {
-                    currentCell = (_invoice.IsRub) ? "L" + i : "N" + i;
+                    currentCell = (_invoice.IsRub) ? "M" + i : "N" + i;
                     _incomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
                 currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Исходящий остаток"))
                 {
-                    currentCell = (_invoice.IsRub) ? "L" + i : "N" + i;
+                    currentCell = (_invoice.IsRub) ? "M" + i : "N" + i;
                     _outcomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
                 currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Итого оборотов"))
                 {
-                    currentCell = (_invoice.IsRub) ? "G" + i : "F" + i;
+                    currentCell = (_invoice.IsRub) ? "H" + i : "F" + i;
                     string formatTotal = FormatTotal(_excelBook.getValue(currentCell, currentCell).ToString());
                     _debetTotal = FormatString(formatTotal);
 
-                    currentCell = (_invoice.IsRub) ? "L" + i : "N" + i;
+                    currentCell = (_invoice.IsRub) ? "M" + i : "N" + i;
                     formatTotal = FormatTotal(_excelBook.getValue(currentCell, currentCell).ToString());
                     _creditTotal = FormatString(formatTotal);
                 }
 
                 i++;
             }
+
+            Validate("Входящий остаток", _incomeTail);
+            Validate("Исходящий остаток", _outcomeTail);
+        }
+
+        private void Validate(string valueName, string value)
+        {
+            if (value == null)
+                throw new NullReferenceException("Не заполнено поле " + valueName);
         }
 
         private string FormatString(string str)
@@ -211,19 +221,21 @@ namespace MT940
 
         private int GetCountBlocks()
         {
+            int spaceCount = (_invoice.IsRub) ? 5 : 2;
+
             int i = 11;
             int countNull = 0;
             int countBlocks = 1;
 
-            while (countNull < 3)
+            while (countNull < 6)
             {
-                currentCell = (_invoice.IsRub) ? "O" + i : "D" + i;
+                currentCell = (_invoice.IsRub) ? "E" + i : "D" + i;
 
-                if ((_excelBook.getValue(currentCell, currentCell) == null) || (_excelBook.getValue(currentCell, currentCell) == null))
+                if (_excelBook.getValue(currentCell, currentCell) == null)
                     countNull++;
                 else
                 {
-                    if (countNull == 2)
+                    if (countNull == spaceCount)
                         countBlocks++;
                     countNull = 0;
                 }
