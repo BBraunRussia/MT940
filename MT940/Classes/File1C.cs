@@ -118,23 +118,23 @@ namespace MT940
 
             while (readBlocks < countBlocks)
             {
-                while (_excelBook.getValue("E" + i, "E" + i) != null)
+                while (_excelBook.getValue("F" + i, "F" + i) != null)
                 {
                     DCRow dcRow = new DCRow();
 
-                    currentCell = (_invoice.IsRub) ? "P" + i : "D" + i; //№ документа
+                    currentCell = (_invoice.IsRub) ? "Q" + i : "D" + i; //№ документа
                     dcRow.SetNumber(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "E" + i : "E" + i; //Счёт дебет
+                    currentCell = (_invoice.IsRub) ? "F" + i : "E" + i; //Счёт дебет
                     dcRow.SetOrdp(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "I" + i : "G" + i; //Счёт кредит
+                    currentCell = (_invoice.IsRub) ? "J" + i : "G" + i; //Счёт кредит
                     dcRow.SetBenm(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "W" + i : "Y" + i; //Назначение платежа
+                    currentCell = (_invoice.IsRub) ? "Y" + i : "Y" + i; //Назначение платежа
                     dcRow.SetCom(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "K" + i : "I" + i; //Сумма по дебету
+                    currentCell = (_invoice.IsRub) ? "L" + i : "I" + i; //Сумма по дебету
                     if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() != string.Empty))
                     {
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
@@ -144,7 +144,7 @@ namespace MT940
                     }
                     else
                     {
-                        currentCell = (_invoice.IsRub) ? "N" + i : "O" + i; //Сумма по кредиту
+                        currentCell = (_invoice.IsRub) ? "P" + i : "O" + i; //Сумма по кредиту
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
                         if (dcRow.Sum != 0.0)
@@ -167,28 +167,28 @@ namespace MT940
 
             while (i < max)
             {
-                currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
+                currentCell = (_invoice.IsRub) ? "C" + i : "C" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Входящий остаток"))
                 {
-                    currentCell = (_invoice.IsRub) ? "M" + i : "N" + i;
+                    currentCell = (_invoice.IsRub) ? "N" + i : "N" + i;
                     _incomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
-                currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
+                currentCell = (_invoice.IsRub) ? "C" + i : "C" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Исходящий остаток"))
                 {
-                    currentCell = (_invoice.IsRub) ? "M" + i : "N" + i;
+                    currentCell = (_invoice.IsRub) ? "N" + i : "N" + i;
                     _outcomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
-                currentCell = (_invoice.IsRub) ? "B" + i : "B" + i;
+                currentCell = (_invoice.IsRub) ? "C" + i : "C" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Итого оборотов"))
                 {
-                    currentCell = (_invoice.IsRub) ? "H" + i : "F" + i;
+                    currentCell = (_invoice.IsRub) ? "I" + i : "F" + i;
                     string formatTotal = FormatTotal(_excelBook.getValue(currentCell, currentCell).ToString());
                     _debetTotal = FormatString(formatTotal);
 
-                    currentCell = (_invoice.IsRub) ? "M" + i : "N" + i;
+                    currentCell = (_invoice.IsRub) ? "N" + i : "N" + i;
                     formatTotal = FormatTotal(_excelBook.getValue(currentCell, currentCell).ToString());
                     _creditTotal = FormatString(formatTotal);
                 }
@@ -229,7 +229,7 @@ namespace MT940
 
             while (countNull < 6)
             {
-                currentCell = (_invoice.IsRub) ? "E" + i : "D" + i;
+                currentCell = (_invoice.IsRub) ? "F" + i : "D" + i;
 
                 if (_excelBook.getValue(currentCell, currentCell) == null)
                     countNull++;
