@@ -12,33 +12,27 @@ namespace MT940
         private ExcelDoc _excelBook;
 
         private string _date;
-        private string _day;
         private string _month;
-        private string _year;
-        private string _compNumber;
         private string _incomeTail;
         private string _outcomeTail;
         private string _debetTotal;
         private string _creditTotal;
 
-        private DCRows debet;
-        private DCRows credit;
-
         private Invoice _invoice;
 
-        public DCRows Debet { get { return debet; } }
-        public DCRows Credit { get { return credit; } }
+        public DCRows Debet { get; private set; }
+        public DCRows Credit { get; private set; }
 
-        public string CompNumber { get { return _compNumber; } }
+        public string CompNumber { get; private set; }
 
-        public string Day { get { return _day; } }
+        public string Day { get; private set; }
         public string MonthDigit { get { return MyMonth.MonthToDigit(_month); } }
-        public string Year { get { return _year; } }
+        public string Year { get; private set; }
 
         public string IncomeTail { get { return (_incomeTail == "0,00") ? "0," : _incomeTail; } }
         public string OutcomeTail { get { return (_outcomeTail == "0,00") ? "0," : _outcomeTail; } }
 
-        public string DateFormated { get { return _year.Substring(2, 2) + MonthDigit + _day; } }
+        public string DateFormated { get { return Year.Substring(2, 2) + MonthDigit + Day; } }
         
         public File1C(ExcelDoc excelBook)
         {
@@ -46,14 +40,14 @@ namespace MT940
             _excelBook = excelBook;
 
             _date = "";
-            _day = "";
+            Day = "";
             _month = "";
-            _year = "";
-            _compNumber = "";
+            Year = "";
+            CompNumber = "";
             _incomeTail = "";
 
-            debet = new DCRows();
-            credit = new DCRows();
+            Debet = new DCRows();
+            Credit = new DCRows();
         }
         
         public void Read()
@@ -66,37 +60,37 @@ namespace MT940
         private void ReadHeader()
         {
             currentCell = (_invoice.IsRub) ? "O5" : "L4";
-            _compNumber = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
+            CompNumber = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                         
-            if (_day == "")
+            if (Day == "")
             {
                 currentCell = (_invoice.IsRub) ? "O8" : "L7";
                 _date = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                 
-                _day = _date.Split(' ')[0];
+                Day = _date.Split(' ')[0];
 
-                if ((Convert.ToInt32(_day) / 10) == 0)
-                    _day = "0" + _day;
+                if ((Convert.ToInt32(Day) / 10) == 0)
+                    Day = "0" + Day;
 
                 _month = _date.Split(' ')[1];
-                _year = _date.Substring(_date.Length - 7, 4);
+                Year = _date.Substring(_date.Length - 7, 4);
             }
         }
                 
         public bool IsSumDebetEqualsDebetTotal()
         {
-            if (ComparisonStrings(debet.Sum, _debetTotal))
+            if (ComparisonStrings(Debet.Sum, _debetTotal))
                 return true;
             else
-                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по дебету (", debet.Sum, ") не совпадает с итоговым значением (", _debetTotal, ")." ));
+                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по дебету (", Debet.Sum, ") не совпадает с итоговым значением (", _debetTotal, ")." ));
         }
 
         public bool IsSumCreditEqualsCreditTotal()
         {
-            if (ComparisonStrings(credit.Sum, _creditTotal))
+            if (ComparisonStrings(Credit.Sum, _creditTotal))
                 return true;
             else
-                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по кредиту (", credit.Sum, ") не совпадает с итоговым значением (", _creditTotal, ")."));
+                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по кредиту (", Credit.Sum, ") не совпадает с итоговым значением (", _creditTotal, ")."));
         }
 
         private bool ComparisonStrings(string str1, string str2)
@@ -118,7 +112,8 @@ namespace MT940
 
             while (readBlocks < countBlocks)
             {
-                while (_excelBook.getValue("F" + i, "F" + i) != null)
+                currentCell = (_invoice.IsRub) ? "Q" + i : "D" + i;
+                while (_excelBook.getValue(currentCell, currentCell) != null)
                 {
                     DCRow dcRow = new DCRow();
 
@@ -140,7 +135,7 @@ namespace MT940
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
                         if (dcRow.Sum != 0.0)
-                            debet.Add(dcRow);
+                            Debet.Add(dcRow);
                     }
                     else
                     {
@@ -148,10 +143,11 @@ namespace MT940
                         dcRow.SetSum(_excelBook.getValue(currentCell, currentCell));
 
                         if (dcRow.Sum != 0.0)
-                            credit.Add(dcRow);
+                            Credit.Add(dcRow);
                     }
 
                     i++;
+                    currentCell = (_invoice.IsRub) ? "Q" + i : "D" + i;
                 }
 
                 i += incement;
@@ -167,21 +163,21 @@ namespace MT940
 
             while (i < max)
             {
-                currentCell = (_invoice.IsRub) ? "C" + i : "C" + i;
+                currentCell = (_invoice.IsRub) ? "C" + i : "B" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Входящий остаток"))
                 {
                     currentCell = (_invoice.IsRub) ? "N" + i : "N" + i;
                     _incomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
-                currentCell = (_invoice.IsRub) ? "C" + i : "C" + i;
+                currentCell = (_invoice.IsRub) ? "C" + i : "B" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Исходящий остаток"))
                 {
                     currentCell = (_invoice.IsRub) ? "N" + i : "N" + i;
                     _outcomeTail = FormatTail(_excelBook.getValue(currentCell, currentCell).ToString());
                 }
 
-                currentCell = (_invoice.IsRub) ? "C" + i : "C" + i;
+                currentCell = (_invoice.IsRub) ? "C" + i : "B" + i;
                 if ((_excelBook.getValue(currentCell, currentCell) != null) && (_excelBook.getValue(currentCell, currentCell).ToString() == "Итого оборотов"))
                 {
                     currentCell = (_invoice.IsRub) ? "I" + i : "F" + i;
