@@ -64,7 +64,7 @@ namespace MT940
                         
             if (Day == "")
             {
-                currentCell = (_invoice.IsRub) ? "O8" : "L7";
+                currentCell = (_invoice.IsRub) ? "O7" : "L7";
                 _date = _excelBook.getValue(currentCell, currentCell).ToString().Replace("\n", "");
                 
                 Day = _date.Split(' ')[0];
