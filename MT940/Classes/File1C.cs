@@ -126,7 +126,7 @@ namespace MT940
                     currentCell = (_invoice.IsRub) ? "J" + i : "G" + i; //Счёт кредит
                     dcRow.SetBenm(_excelBook.getValue(currentCell, currentCell));
 
-                    currentCell = (_invoice.IsRub) ? "Y" + i : "Y" + i; //Назначение платежа
+                    currentCell = (_invoice.IsRub) ? "AA" + i : "Y" + i; //Назначение платежа
                     dcRow.SetCom(_excelBook.getValue(currentCell, currentCell));
 
                     currentCell = (_invoice.IsRub) ? "L" + i : "I" + i; //Сумма по дебету
