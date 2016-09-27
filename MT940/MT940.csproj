@@ -51,8 +51,8 @@
     <Compile Include="fHelp.Designer.cs">
       <DependentUpon>fHelp.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes\File1C.cs" />
-    <Compile Include="Classes\File1COpening.cs" />
+    <Compile Include="Classes\FileSberbank.cs" />
+    <Compile Include="Classes\FileSberbankOpening.cs" />
     <Compile Include="Classes\FileTxt.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>

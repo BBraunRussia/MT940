@@ -37,24 +37,24 @@ namespace MT940
         {
             try
             {
-                using (ExcelDoc excelBook = new ExcelDoc(File1COpening.GetFileName()))
+                using (ExcelDoc excelBook = new ExcelDoc(FileSberbankOpening.GetFileName()))
                 {
                     using (FileTxt fileTxt = new FileTxt())
                     {
-                        File1C file1C = new File1C(excelBook);
+                        FileSberbank fileSberbank = new FileSberbank(excelBook);
 
                         InputDialog id = new InputDialog();
 
                         if (id.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                         {
-                            file1C.Read();
+                            fileSberbank.Read();
 
-                            file1C.IsSumDebetEqualsDebetTotal();
-                            file1C.IsSumCreditEqualsCreditTotal();
+                            fileSberbank.IsSumDebetEqualsDebetTotal();
+                            fileSberbank.IsSumCreditEqualsCreditTotal();
 
-                            fileTxt.Init(file1C, excelBook);
-                            fileTxt.WriteBody(FileTxt.TypeRow.D, file1C.Debet);
-                            fileTxt.WriteBody(FileTxt.TypeRow.C, file1C.Credit);
+                            fileTxt.Init(fileSberbank, excelBook);
+                            fileTxt.WriteBody(FileTxt.TypeRow.D, fileSberbank.Debet);
+                            fileTxt.WriteBody(FileTxt.TypeRow.C, fileSberbank.Credit);
 
                             fileTxt.WriteBottom();
 

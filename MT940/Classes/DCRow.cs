@@ -31,7 +31,7 @@ namespace MT940
             if (value == null)
                 return;
 
-            double.TryParse(File1C.DeleteSplits(value.ToString()), out _sum);
+            double.TryParse(FileSberbank.DeleteSplits(value.ToString()), out _sum);
         }
 
         public void SetNumber(object value)

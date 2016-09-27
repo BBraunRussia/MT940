@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace MT940
 {
-    public static class File1COpening
+    public static class FileSberbankOpening
     {
         public static string GetFileName()
         {

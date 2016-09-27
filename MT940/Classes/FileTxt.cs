@@ -11,12 +11,12 @@ namespace MT940
         public enum TypeRow { D, C }
 
         private StreamWriter _streamWriter;
-        private File1C _file1C;
+        private FileSberbank _file1C;
         private ExcelDoc _excelBook;
 
         private Invoice _invoice;
 
-        public void Init(File1C file1C, ExcelDoc excelBook)
+        public void Init(FileSberbank file1C, ExcelDoc excelBook)
         {
             _file1C = file1C;
             _excelBook = excelBook;

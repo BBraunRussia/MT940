@@ -5,7 +5,7 @@ using System.Text;
 
 namespace MT940
 {
-    public class File1C
+    public class FileSberbank
     {
         public static string currentCell;
 
@@ -34,7 +34,7 @@ namespace MT940
 
         public string DateFormated { get { return Year.Substring(2, 2) + MonthDigit + Day; } }
         
-        public File1C(ExcelDoc excelBook)
+        public FileSberbank(ExcelDoc excelBook)
         {
             _invoice = Invoice.GetUniqueInstance();
             _excelBook = excelBook;
@@ -76,37 +76,11 @@ namespace MT940
                 Year = _date.Substring(_date.Length - 7, 4);
             }
         }
-                
-        public bool IsSumDebetEqualsDebetTotal()
-        {
-            if (ComparisonStrings(Debet.Sum, _debetTotal))
-                return true;
-            else
-                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по дебету (", Debet.Sum, ") не совпадает с итоговым значением (", _debetTotal, ")." ));
-        }
-
-        public bool IsSumCreditEqualsCreditTotal()
-        {
-            if (ComparisonStrings(Credit.Sum, _creditTotal))
-                return true;
-            else
-                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по кредиту (", Credit.Sum, ") не совпадает с итоговым значением (", _creditTotal, ")."));
-        }
-
-        private bool ComparisonStrings(string str1, string str2)
-        {
-            if (str1.Length > str2.Length)
-                str1 = str1.Substring(0, str2.Length);
-            else if (str1.Length < str2.Length)
-                str2 = str2.Substring(0, str1.Length);
-
-            return str1 == str2;
-        }
-
+        
         private void ReadBody()
         {
             int i = (_invoice.IsRub) ? 12 : 11; //первая строка с данными
-            int incement = (_invoice.IsRub) ? 7 : 4; //первая строка с данными
+            int incement = (_invoice.IsRub) ? 7 : 4;
             int readBlocks = 0;
             int countBlocks = GetCountBlocks();
 
@@ -157,7 +131,7 @@ namespace MT940
             ReadTails(i - incement);
         }
 
-        public void ReadTails(int i)
+        public void ReadTails(int i)//Чтение итоговых значений
         {
             int max = i + 20;
 
@@ -257,6 +231,32 @@ namespace MT940
         public static string DeleteSplits(string value)
         {
             return (value.Contains('.')) ? value.Replace(",", " ").Replace(".", ",").Replace(" ", "") : value.Replace(" ", "");
+        }
+
+        public bool IsSumDebetEqualsDebetTotal()
+        {
+            if (ComparisonStrings(Debet.Sum, _debetTotal))
+                return true;
+            else
+                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по дебету (", Debet.Sum, ") не совпадает с итоговым значением (", _debetTotal, ")."));
+        }
+
+        public bool IsSumCreditEqualsCreditTotal()
+        {
+            if (ComparisonStrings(Credit.Sum, _creditTotal))
+                return true;
+            else
+                throw new OverflowException(string.Concat("Формирование файла отменено, так как сумма по кредиту (", Credit.Sum, ") не совпадает с итоговым значением (", _creditTotal, ")."));
+        }
+
+        private bool ComparisonStrings(string str1, string str2)
+        {
+            if (str1.Length > str2.Length)
+                str1 = str1.Substring(0, str2.Length);
+            else if (str1.Length < str2.Length)
+                str2 = str2.Substring(0, str1.Length);
+
+            return str1 == str2;
         }
     }
 }
